@@ -157,6 +157,47 @@ async def list_medicamentos_farmacia(
     }
 
 
+@app.patch(
+    "/farmacia/medicamentos/{id}",
+    response_model=MedicamentoResponse
+)
+async def update_medicamento_farmacia(id: str, update_data: MedicamentoUpdate):
+    """Actualiza exclusivamente un documento de medicamentos_farmacia."""
+    if not PydanticObjectId.is_valid(id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Formato de ID invalido"
+        )
+
+    medicamento = await MedicamentoFarmacia.get(id)
+    if not medicamento:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Medicamento de farmacia no encontrado"
+        )
+
+    update_dict = update_data.model_dump(exclude_unset=True)
+    if "nombre" in update_dict:
+        nombre = (update_dict["nombre"] or "").strip()
+        if not nombre:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="El nombre no puede quedar vacio"
+            )
+        update_dict["nombre"] = nombre
+
+    try:
+        if update_dict:
+            await medicamento.update({"$set": update_dict})
+    except DuplicateKeyError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Ya existe un medicamento con ese codigo de barras"
+        )
+
+    return await MedicamentoFarmacia.get(id)
+
+
 @app.get("/farmacia/laboratorios", response_model=list[str])
 async def get_laboratorios_farmacia():
     values = await MedicamentoFarmacia.distinct("laboratorio")

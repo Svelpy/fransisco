@@ -21,6 +21,31 @@ const pageInfo = document.getElementById('pharmacyPageInfo');
 const detailModal = document.getElementById('pharmacyDetailModal');
 const closeModal = document.getElementById('pharmacyCloseModal');
 const modalDetails = document.getElementById('pharmacyModalDetails');
+const editForm = document.getElementById('pharmacyEditForm');
+const editFields = document.getElementById('pharmacyEditFields');
+const viewActions = document.getElementById('pharmacyViewActions');
+const btnEdit = document.getElementById('pharmacyBtnEdit');
+const btnCancelEdit = document.getElementById('pharmacyBtnCancelEdit');
+const btnSaveEdit = document.getElementById('pharmacyBtnSaveEdit');
+const pharmacyToast = document.getElementById('pharmacyToast');
+let selectedPharmacyMedicine = null;
+let pharmacyToastTimer;
+
+const editFieldConfig = [
+    { name: 'codigo_barra', label: 'C\u00f3digo de barras' },
+    { name: 'rs', label: 'Registro sanitario (RS)' },
+    { name: 'nombre', label: 'Nombre', required: true },
+    { name: 'forma_farmaceutica', label: 'Forma farmac\u00e9utica' },
+    { name: 'laboratorio', label: 'Laboratorio' },
+    { name: 'distribuidor', label: 'Distribuidor' },
+    { name: 'principio_activo', label: 'Principio activo' },
+    { name: 'enlace', label: 'Enlace' },
+    { name: 'accion_terapeutica', label: 'Acci\u00f3n terap\u00e9utica' },
+    { name: 'categoria', label: 'Categor\u00eda' },
+    { name: 'formulacion', label: 'Formulaci\u00f3n', multiline: true },
+    { name: 'presentaciones', label: 'Presentaciones', multiline: true },
+    { name: 'descripcion', label: 'Descripci\u00f3n', multiline: true }
+];
 
 async function fetchPharmacyFilters() {
     try {
@@ -172,6 +197,7 @@ function appendDetail(label, value, isLink = false) {
 }
 
 function openPharmacyModal(medicine) {
+    selectedPharmacyMedicine = medicine;
     document.getElementById('pharmacyModalName').textContent = medicine.nombre || 'Sin nombre';
     document.getElementById('pharmacyModalBrand').textContent =
         [medicine.laboratorio, medicine.distribuidor].filter(Boolean).join(' - ') || '-';
@@ -187,12 +213,104 @@ function openPharmacyModal(medicine) {
     appendDetail('Presentaciones', medicine.presentaciones);
     appendDetail('Descripci\u00f3n', medicine.descripcion);
     appendDetail('Enlace de referencia', medicine.enlace, true);
+    showPharmacyDetails();
     detailModal.classList.remove('hidden');
+}
+
+function showPharmacyDetails() {
+    modalDetails.classList.remove('hidden');
+    viewActions.classList.remove('hidden');
+    editForm.classList.add('hidden');
+}
+
+function showPharmacyToast(message, type = 'success') {
+    clearTimeout(pharmacyToastTimer);
+    pharmacyToast.textContent = message;
+    pharmacyToast.className = `toast toast-${type}`;
+    pharmacyToastTimer = setTimeout(() => pharmacyToast.classList.add('hidden'), 3500);
+}
+
+function formatPharmacyApiError(body) {
+    if (typeof body?.detail === 'string') return body.detail;
+    if (Array.isArray(body?.detail)) return body.detail.map(error => error.msg).join('. ');
+    return 'No se pudieron guardar los cambios';
+}
+
+function openPharmacyEdit() {
+    if (!selectedPharmacyMedicine) return;
+    editFields.innerHTML = '';
+
+    editFieldConfig.forEach(field => {
+        const wrapper = document.createElement('label');
+        wrapper.className = `form-field${field.multiline ? ' form-field-wide' : ''}`;
+
+        const label = document.createElement('span');
+        label.className = 'form-label';
+        label.textContent = field.label;
+
+        const control = document.createElement(field.multiline ? 'textarea' : 'input');
+        control.className = 'clone-input';
+        control.name = field.name;
+        control.value = selectedPharmacyMedicine[field.name] ?? '';
+        control.required = Boolean(field.required);
+        control.setAttribute('aria-label', field.label);
+
+        wrapper.append(label, control);
+        editFields.appendChild(wrapper);
+    });
+
+    modalDetails.classList.add('hidden');
+    viewActions.classList.add('hidden');
+    editForm.classList.remove('hidden');
 }
 
 function closePharmacyModal() {
     detailModal.classList.add('hidden');
+    showPharmacyDetails();
 }
+
+btnEdit.addEventListener('click', openPharmacyEdit);
+btnCancelEdit.addEventListener('click', showPharmacyDetails);
+
+editForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!selectedPharmacyMedicine) return;
+
+    const payload = {};
+    const formData = new FormData(editForm);
+    editFieldConfig.forEach(field => {
+        const value = String(formData.get(field.name) ?? '').trim();
+        payload[field.name] = value || null;
+    });
+
+    if (!payload.nombre) {
+        showPharmacyToast('El nombre del medicamento es obligatorio', 'error');
+        return;
+    }
+
+    btnSaveEdit.disabled = true;
+    btnSaveEdit.textContent = 'Guardando...';
+
+    try {
+        const response = await fetch(`${PHARMACY_API_URL}/${selectedPharmacyMedicine.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(formatPharmacyApiError(body));
+
+        selectedPharmacyMedicine = body;
+        closePharmacyModal();
+        showPharmacyToast('Medicamento de farmacia actualizado correctamente');
+        await Promise.all([fetchPharmacyMedicines(), fetchPharmacyFilters()]);
+    } catch (error) {
+        showPharmacyToast(error.message || 'No se pudieron guardar los cambios', 'error');
+    } finally {
+        btnSaveEdit.disabled = false;
+        btnSaveEdit.textContent = 'Guardar cambios';
+    }
+});
 
 btnSearch.addEventListener('click', () => {
     pharmacyState.page = 1;

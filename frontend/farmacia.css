@@ -110,3 +110,15 @@
     padding: 2rem;
     text-align: center;
 }
+
+.pharmacy-modal-actions {
+    padding: 0 2rem 2rem;
+}
+
+.pharmacy-modal-content .create-form {
+    padding-top: 1.25rem;
+}
+
+.pharmacy-modal-content .clone-input {
+    border-color: var(--pharmacy-border);
+}

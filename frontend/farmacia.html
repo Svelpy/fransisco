@@ -57,9 +57,21 @@
                 <p id="pharmacyModalBrand" class="subtitle"></p>
             </div>
             <div id="pharmacyModalDetails" class="modal-body"></div>
+            <form id="pharmacyEditForm" class="create-form hidden">
+                <div id="pharmacyEditFields" class="form-grid"></div>
+                <div class="modal-actions">
+                    <button type="button" id="pharmacyBtnCancelEdit" class="btn-secondary">Cancelar</button>
+                    <button type="submit" id="pharmacyBtnSaveEdit" class="btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+            <div id="pharmacyViewActions" class="modal-actions pharmacy-modal-actions">
+                <button type="button" id="pharmacyBtnEdit" class="btn-primary">Editar</button>
+            </div>
         </div>
     </div>
 
-    <script src="farmacia.js?v=2"></script>
+    <div id="pharmacyToast" class="toast hidden" role="status" aria-live="polite"></div>
+
+    <script src="farmacia.js?v=3"></script>
 </body>
 </html>
