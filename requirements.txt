@@ -1,0 +1,5 @@
+fastapi[standard]==0.138.1
+sqlmodel==0.0.39
+beanie
+motor
+python-dotenv==1.0.1

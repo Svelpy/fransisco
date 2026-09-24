@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Francisco - Consulta de Medicamentos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+    <header class="app-header">
+        <div class="logo">Francisco</div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar medicamento por nombre, código o principio activo..." autocomplete="off">
+            
+            <div class="filters">
+                <div class="dropdown-wrapper">
+                    <input type="text" id="labInput" placeholder="Laboratorio (Todos)" autocomplete="off">
+                    <div id="labDropdown" class="dropdown-content hidden"></div>
+                </div>
+                
+                <div class="dropdown-wrapper">
+                    <input type="text" id="distInput" placeholder="Distribuidor (Todos)" autocomplete="off">
+                    <div id="distDropdown" class="dropdown-content hidden"></div>
+                </div>
+            </div>
+            
+            <button id="btnSearch" class="btn-primary">Buscar</button>
+            <button id="btnClear" class="btn-secondary">Limpiar</button>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <div class="results-header">
+            <span id="resultsCount">Cargando resultados...</span>
+        </div>
+        
+        <div id="cardsContainer" class="cards-grid">
+            <!-- Las tarjetas se inyectarán aquí vía JS -->
+        </div>
+
+        <div class="pagination" id="paginationControls">
+            <button id="btnPrev" disabled>&laquo; Anterior</button>
+            <span id="pageInfo">Página 1</span>
+            <button id="btnNext" disabled>Siguiente &raquo;</button>
+        </div>
+    </main>
+
+    <!-- Modal para Detalle -->
+    <div id="detailModal" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <h2 id="modalNombre">Nombre Medicamento</h2>
+                    <button class="copy-btn" data-target="modalNombre">📋</button>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem;">
+                    <p id="modalMarca" class="subtitle">Laboratorio - Distribuidor</p>
+                    <button class="copy-btn" data-target="modalMarca">📋</button>
+                </div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="field-row">
+                    <div class="field-info">
+                        <span class="label">Principio Activo</span>
+                        <span class="value" id="modalPrincipioActivo"></span>
+                    </div>
+                    <button class="copy-btn" data-target="modalPrincipioActivo">📋</button>
+                </div>
+                
+                <div class="field-row">
+                    <div class="field-info">
+                        <span class="label">Registro Sanitario (RS)</span>
+                        <span class="value" id="modalRs"></span>
+                    </div>
+                    <button class="copy-btn" data-target="modalRs">📋</button>
+                </div>
+                
+                <div class="field-row">
+                    <div class="field-info">
+                        <span class="label">Categoría</span>
+                        <span class="value" id="modalCategoria"></span>
+                    </div>
+                    <button class="copy-btn" data-target="modalCategoria">📋</button>
+                </div>
+
+                <div class="field-row desc-row">
+                    <div class="field-info">
+                        <span class="label">Descripción</span>
+                        <span class="value" id="modalDescripcion"></span>
+                    </div>
+                    <button class="copy-btn" data-target="modalDescripcion">📋</button>
+                </div>
+                
+                <hr class="elegant-separator">
+                <h3 class="extra-title">Información Adicional</h3>
+                
+                <div class="field-row">
+                    <div class="field-info">
+                        <span class="label">Acción Terapéutica</span>
+                        <span class="value" id="modalAccion"></span>
+                    </div>
+                    <button class="copy-btn" data-target="modalAccion">📋</button>
+                </div>
+                
+                <div class="field-row">
+                    <div class="field-info">
+                        <span class="label">Forma Farmacéutica</span>
+                        <span class="value" id="modalForma"></span>
+                    </div>
+                    <button class="copy-btn" data-target="modalForma">📋</button>
+                </div>
+                
+                <div class="field-row">
+                    <div class="field-info">
+                        <span class="label">Enlace Detalle</span>
+                        <a href="#" target="_blank" class="value link" id="modalEnlace"></a>
+                    </div>
+                    <button class="copy-btn" data-target="modalEnlace">📋</button>
+                </div>
+                
+                <div class="modal-actions detail-actions">
+                    <button id="btnCreateFrom" class="btn-create-from">Crear a partir de este medicamento</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear un medicamento usando otro como base -->
+    <div id="createModal" class="modal create-modal hidden">
+        <div class="modal-content create-modal-content">
+            <button type="button" class="close-modal" id="closeCreateModal" aria-label="Cerrar">&times;</button>
+            <div class="modal-header">
+                <h2>Crear medicamento</h2>
+                <p class="subtitle">Haz clic en un campo para editarlo.</p>
+            </div>
+            <form id="createForm" class="create-form">
+                <div id="createFields" class="form-grid"></div>
+                <div class="modal-actions">
+                    <button type="submit" id="btnSaveCreate" class="btn-primary">Guardar</button>
+                    <button type="button" id="btnCancelCreate" class="btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+    <script src="app.js?v=5"></script>
+</body>
+</html>

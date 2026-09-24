@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Francisco - Medicamentos de Farmacia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="farmacia.css?v=1">
+</head>
+<body class="pharmacy-page">
+    <header class="app-header pharmacy-header">
+        <div class="logo">Francisco &middot; Farmacia</div>
+        <div class="search-container">
+            <input
+                type="text"
+                id="pharmacySearchInput"
+                placeholder="Buscar en farmacia por nombre o c&oacute;digo de barras..."
+                autocomplete="off"
+            >
+            <div class="filters">
+                <div class="dropdown-wrapper">
+                    <input type="text" id="pharmacyLabInput" placeholder="Laboratorio (Todos)" autocomplete="off">
+                    <div id="pharmacyLabDropdown" class="dropdown-content hidden"></div>
+                </div>
+                <div class="dropdown-wrapper">
+                    <input type="text" id="pharmacyDistInput" placeholder="Distribuidor (Todos)" autocomplete="off">
+                    <div id="pharmacyDistDropdown" class="dropdown-content hidden"></div>
+                </div>
+            </div>
+            <button id="pharmacyBtnSearch" class="btn-primary">Buscar</button>
+            <button id="pharmacyBtnClear" class="btn-secondary">Limpiar</button>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <div class="results-header pharmacy-results-header">
+            <span id="pharmacyResultsCount">Cargando resultados...</span>
+        </div>
+
+        <div id="pharmacyCardsContainer" class="cards-grid"></div>
+
+        <div class="pagination" id="pharmacyPaginationControls">
+            <button id="pharmacyBtnPrev" disabled>&laquo; Anterior</button>
+            <span id="pharmacyPageInfo">P&aacute;gina 1</span>
+            <button id="pharmacyBtnNext" disabled>Siguiente &raquo;</button>
+        </div>
+    </main>
+
+    <div id="pharmacyDetailModal" class="modal pharmacy-detail-modal hidden">
+        <div class="modal-content pharmacy-modal-content">
+            <button type="button" class="close-modal" id="pharmacyCloseModal" aria-label="Cerrar">&times;</button>
+            <div class="modal-header">
+                <h2 id="pharmacyModalName">Medicamento</h2>
+                <p id="pharmacyModalBrand" class="subtitle"></p>
+            </div>
+            <div id="pharmacyModalDetails" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="farmacia.js?v=2"></script>
+</body>
+</html>

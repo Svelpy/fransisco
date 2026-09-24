@@ -1,0 +1,112 @@
+:root {
+    --pharmacy-blue: #2563eb;
+    --pharmacy-blue-dark: #1d4ed8;
+    --pharmacy-blue-soft: #dbeafe;
+    --pharmacy-blue-pale: #eff6ff;
+    --pharmacy-border: #93c5fd;
+}
+
+.pharmacy-page {
+    background: linear-gradient(180deg, var(--pharmacy-blue-pale) 0, #f8fafc 420px);
+}
+
+.pharmacy-header {
+    background: var(--pharmacy-blue-soft);
+    border-bottom: 1px solid var(--pharmacy-border);
+}
+
+.pharmacy-header .logo,
+.pharmacy-results-header {
+    color: #1e3a8a;
+}
+
+.pharmacy-header .btn-primary {
+    background: var(--pharmacy-blue);
+}
+
+.pharmacy-header .btn-primary:hover {
+    background: var(--pharmacy-blue-dark);
+}
+
+.pharmacy-header .btn-secondary {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: var(--pharmacy-border);
+    color: #1e3a8a;
+}
+
+.pharmacy-header input[type="text"]:focus {
+    border-color: var(--pharmacy-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+}
+
+.pharmacy-header .dropdown-content {
+    border-color: var(--pharmacy-border);
+}
+
+.pharmacy-card {
+    border-color: #bfdbfe;
+    box-shadow: 0 1px 2px rgba(30, 64, 175, 0.06);
+}
+
+.pharmacy-card:hover {
+    border-color: var(--pharmacy-border);
+    box-shadow: 0 10px 20px -8px rgba(30, 64, 175, 0.28);
+}
+
+.pharmacy-active-ingredient {
+    color: #334155;
+    font-size: 0.875rem;
+}
+
+.barcode-badge {
+    align-self: flex-start;
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    background: var(--pharmacy-blue-soft);
+    color: #1e40af;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.barcode-missing {
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+.pharmacy-card-btn {
+    background: var(--pharmacy-blue-soft);
+    color: #1e40af;
+}
+
+.pharmacy-card-btn:hover {
+    background: #bfdbfe;
+}
+
+.pharmacy-page .pagination button:not(:disabled) {
+    background: var(--pharmacy-blue);
+    color: #ffffff;
+}
+
+.pharmacy-detail-modal {
+    background: rgba(30, 64, 175, 0.38);
+}
+
+.pharmacy-modal-content {
+    background: var(--pharmacy-blue-pale);
+    border: 1px solid var(--pharmacy-border);
+}
+
+.pharmacy-modal-content .modal-header {
+    border-bottom-color: #bfdbfe;
+}
+
+.pharmacy-modal-content .field-row:hover {
+    background: var(--pharmacy-blue-soft);
+}
+
+.pharmacy-empty {
+    color: #475569;
+    grid-column: 1 / -1;
+    padding: 2rem;
+    text-align: center;
+}
