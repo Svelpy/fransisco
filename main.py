@@ -5,6 +5,8 @@ BASE_DIR = Path(__file__).resolve().parent
 import os
 import re
 import math
+import csv
+import io
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
@@ -13,7 +15,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import DuplicateKeyError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from beanie import init_beanie, PydanticObjectId
 from beanie.operators import Or, RegEx
 
@@ -28,6 +30,54 @@ from schemas import (
 # Load environment variables
 load_dotenv()
 MONGODB_URL = os.getenv("MONGODB_URL")
+
+CSV_COLUMNS = [
+    "id",
+    "codigo_barra",
+    "rs",
+    "nombre",
+    "forma_farmaceutica",
+    "laboratorio",
+    "distribuidor",
+    "principio_activo",
+    "enlace",
+    "accion_terapeutica",
+    "categoria",
+    "formulacion",
+    "presentaciones",
+    "descripcion",
+]
+
+
+def crear_respuesta_csv(medicamentos, nombre_archivo: str) -> Response:
+    output = io.StringIO(newline="")
+    writer = csv.DictWriter(
+        output,
+        fieldnames=CSV_COLUMNS,
+        extrasaction="ignore",
+    )
+    writer.writeheader()
+
+    for medicamento in medicamentos:
+        datos = medicamento.model_dump(mode="json")
+        fila = {}
+        for columna in CSV_COLUMNS:
+            valor = datos.get(columna) or ""
+            if isinstance(valor, str):
+                # Una fila visual por medicamento, conservando el resto del texto.
+                valor = re.sub(r"[\r\n]+", " ", valor)
+            fila[columna] = valor
+        writer.writerow(fila)
+
+    # La marca BOM permite que Excel reconozca UTF-8 y conserve los acentos.
+    contenido = ("\ufeff" + output.getvalue()).encode("utf-8")
+    return Response(
+        content=contenido,
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{nombre_archivo}"'
+        },
+    )
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -157,6 +207,20 @@ async def list_medicamentos_farmacia(
     }
 
 
+@app.get("/farmacia/exportar-medicamentos.csv")
+async def exportar_medicamentos_farmacia_csv():
+    """Exporta todos los documentos de medicamentos_farmacia, sin paginacion."""
+    medicamentos = await (
+        MedicamentoFarmacia.find_all()
+        # Los ObjectId de MongoDB contienen la fecha de creacion.
+        # Orden ascendente: del registro mas antiguo al mas reciente.
+        .sort("_id")
+        .to_list()
+    )
+
+    return crear_respuesta_csv(medicamentos, "medicamentos_farmacia.csv")
+
+
 @app.patch(
     "/farmacia/medicamentos/{id}",
     response_model=MedicamentoResponse
@@ -261,6 +325,13 @@ async def list_medicamentos(
         "total_pages": total_pages,
         "data": medicamentos
     }
+
+
+@app.get("/exportar-medicamentos.csv")
+async def exportar_medicamentos_csv():
+    """Exporta todos los documentos de la coleccion principal medicamentos."""
+    medicamentos = await Medicamento.find_all().sort("_id").to_list()
+    return crear_respuesta_csv(medicamentos, "medicamentos.csv")
 
 @app.get("/laboratorios", response_model=list[str])
 async def get_laboratorios():

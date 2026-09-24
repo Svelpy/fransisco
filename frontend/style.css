@@ -494,6 +494,32 @@ textarea.clone-input {
     background: #b91c1c;
 }
 
+.database-export {
+    display: flex;
+    justify-content: center;
+    margin: 2.5rem 0 1rem;
+}
+
+.database-export-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #ffffff;
+    color: var(--text-main);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.database-export-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 @media (max-width: 600px) {
     .form-grid {
         grid-template-columns: 1fr;
